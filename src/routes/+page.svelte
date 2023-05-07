@@ -125,17 +125,28 @@
 </script>
 
 <div class="flex w-full">
-	<div class="flex-grow max-w-sm flex flex-col gap-4 overflow-y-auto h-screen">
-		<div class="flex m-3 items-end justify-between">
-			<div class="text-3xl">🛩️📡 Aircraft Radar</div>
-			<div class="text-sm">
-				By <a href="https://github.com/chrisjm" class="text-primary underline" target="_blank"
-					>chrisjm</a
-				>
-			</div>
+	<div class="flex-grow max-w-xs flex flex-col gap-4 overflow-y-auto h-screen">
+		<div class="ml-4 mt-3 text-3xl">🛩️📡 Aircraft Radar</div>
+		<div class="ml-4 text-xs">
+			Created By: <a href="https://github.com/chrisjm" class="underline" target="_blank">chrisjm</a>;
+			<span>Credits:</span>
+			<a
+				class="underline"
+				href="https://charliegerard.dev/blog/aircraft-radar-system-rtl-sdr-web-usb/"
+				target="_blank">Charlie Gerard</a
+			>,
+			<a class="underline" href="https://github.com/sandeepmistry/rtlsdrjs" target="_blank"
+				>rtlsdr.js</a
+			>,
+			<a class="underline" href="https://github.com/watson/mode-s-demodulator" target="_blank"
+				>demod</a
+			>,
+			<a class="underline" href="https://github.com/dimfeld/svelte-maplibre" target="_blank"
+				>svelte-maplibre</a
+			>
 		</div>
 
-		<div class="mx-3 text-center">
+		<div class="ml-4 text-center">
 			{#if sdr}
 				{#if readSamples}
 					<button class="btn btn-sm btn-error" on:click={handleEnd}>End Scanning</button>
@@ -149,9 +160,9 @@
 		</div>
 
 		{#each Object.values(radarStore).sort(sorter({ value: 'count', descending: true })) as aircraft}
-			<div class="card card-compact card-bordered p-2 shadow-md">
+			<div class="card card-compact card-bordered ml-4 shadow-md">
 				<div class="card-body">
-					<h2 class="card-title">
+					<h3 class="text-3xl mt-1">
 						{#if aircraft.callsign}
 							<a
 								class="text-primary underline"
@@ -160,17 +171,23 @@
 							>
 							<span class="text-xs text-base-300">(ICAO {aircraft.icao})</span>
 						{:else}<span class="text-base-300">ICAO {aircraft.icao}</span>{/if}
-					</h2>
-					<div class="text-xs text-base-300 my-2">
+					</h3>
+					<div class="text-xs text-base-300">
 						Last seen: {new Date(aircraft.seen).toLocaleString()} ({aircraft.count})
 					</div>
-					<div class="flex flex-wrap gap-1">
-						<span class="badge badge-md">Altitude: {aircraft.altitude} ft</span>
-						<span class="badge badge-md">Heading: {aircraft.heading.toFixed(0)}°</span>
-						<span class="badge badge-md">Speed: {aircraft.speed.toFixed(0)} knots</span>
-						<span class="badge badge-md">
+					<div class="mt-2">
+						<div class:text-base-200={aircraft.altitude === 0}>
+							Altitude: {aircraft.altitude} ft
+						</div>
+						<div class:text-base-200={aircraft.altitude === 0}>
+							Heading: {aircraft.heading.toFixed(0)}°
+						</div>
+						<div class:text-base-200={aircraft.altitude === 0}>
+							Speed: {aircraft.speed.toFixed(0)} knots
+						</div>
+						<div class:text-base-200={aircraft.lat === 0 || aircraft.lng === 0}>
 							Lng/Lat: {aircraft.lng.toFixed(4)}/{aircraft.lat.toFixed(4)}
-						</span>
+						</div>
 					</div>
 				</div>
 			</div>
