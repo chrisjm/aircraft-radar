@@ -128,7 +128,8 @@
 	<div class="flex-grow max-w-xs flex flex-col gap-4 overflow-y-auto h-screen">
 		<div class="ml-4 mt-3 text-3xl">🛩️📡 Aircraft Radar</div>
 		<div class="ml-4 text-xs">
-			Created By: <a href="https://github.com/chrisjm" class="underline" target="_blank">chrisjm</a>;
+			Created by: <a href="https://github.com/chrisjm" class="underline" target="_blank">chrisjm</a
+			>;
 			<span>Credits:</span>
 			<a
 				class="underline"
@@ -139,7 +140,7 @@
 				>rtlsdr.js</a
 			>,
 			<a class="underline" href="https://github.com/watson/mode-s-demodulator" target="_blank"
-				>demod</a
+				>mode-s-demodulator</a
 			>,
 			<a class="underline" href="https://github.com/dimfeld/svelte-maplibre" target="_blank"
 				>svelte-maplibre</a
@@ -155,7 +156,7 @@
 					<button class="btn btn-primary" on:click={handleStart}>Start Scanning</button>
 				{/if}
 			{:else}
-				<button class="btn btn-primary" on:click={handleClick}>Register USB Antenna</button>
+				<button class="btn" on:click={handleClick}>Register USB Antenna</button>
 			{/if}
 		</div>
 
