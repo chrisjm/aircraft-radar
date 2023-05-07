@@ -128,23 +128,33 @@
 	<div class="flex-grow max-w-xs flex flex-col gap-4 overflow-y-auto h-screen">
 		<div class="ml-4 mt-3 text-3xl">🛩️📡 Aircraft Radar</div>
 		<div class="ml-4 text-xs">
-			Created by: <a href="https://github.com/chrisjm" class="underline" target="_blank">chrisjm</a
-			>;
-			<span>Credits:</span>
-			<a
-				class="underline"
-				href="https://charliegerard.dev/blog/aircraft-radar-system-rtl-sdr-web-usb/"
-				target="_blank">Charlie Gerard</a
-			>,
-			<a class="underline" href="https://github.com/sandeepmistry/rtlsdrjs" target="_blank"
-				>rtlsdr.js</a
-			>,
-			<a class="underline" href="https://github.com/watson/mode-s-demodulator" target="_blank"
-				>mode-s-demodulator</a
-			>,
-			<a class="underline" href="https://github.com/dimfeld/svelte-maplibre" target="_blank"
-				>svelte-maplibre</a
-			>
+			<div>
+				Built by: Chris J Mears (<a
+					href="https://github.com/chrisjm"
+					class="underline"
+					target="_blank">chrisjm</a
+				>)
+			</div>
+			<div>
+				<span>Credits:</span>
+				<a
+					class="underline"
+					target="_blank"
+					href="https://charliegerard.dev/blog/aircraft-radar-system-rtl-sdr-web-usb/"
+					>Charlie Gerard</a
+				>,
+				<a class="underline" target="_blank" href="https://github.com/sandeepmistry/rtlsdrjs"
+					>rtlsdr.js</a
+				>,
+				<a class="underline" target="_blank" href="https://github.com/watson/mode-s-demodulator"
+					>mode-s-demodulator</a
+				>,
+				<a class="underline" target="_blank" href="https://github.com/dimfeld/svelte-maplibre"
+					>svelte-maplibre</a
+				>
+				<a class="underline" target="_blank" href="https://tailwindcss.com/">tailwindcss</a>
+				<a class="underline" target="_blank" href="https://daisyui.com/">daisyUI</a>
+			</div>
 		</div>
 
 		<div class="ml-4 text-center">

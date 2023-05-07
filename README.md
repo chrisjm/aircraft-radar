@@ -31,3 +31,5 @@ npm run build
 * [rtlsdr.js](https://github.com/sandeepmistry/rtlsdrjs)
 * [mode-s-demodulator](https://github.com/watson/mode-s-demodulator)
 * [svelte-maplibre](https://github.com/dimfeld/svelte-maplibre)
+* [tailwindcss](https://tailwindcss.com/)
+* [daisyUI](https://daisyui.com/)
