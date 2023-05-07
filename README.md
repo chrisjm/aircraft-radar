@@ -2,6 +2,8 @@
 
 Visualizing aircraft information and position using ADS-B aircraft radio frequency and data.
 
+<img width="1440" alt="Screenshot 2023-05-06 at 9 04 52 PM" src="https://user-images.githubusercontent.com/96110/236657660-e0aff454-61c3-4759-b59f-3b0058dfdb88.png">
+
 ## Developing
 
 Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
