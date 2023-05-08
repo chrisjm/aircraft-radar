@@ -126,7 +126,7 @@
 
 <div class="flex w-full">
 	<div class="flex-grow max-w-xs flex flex-col gap-4 overflow-y-auto h-screen">
-		<div class="ml-4 mt-3 text-3xl">🛩️📡 Aircraft Radar</div>
+		<div class="ml-4 mt-3 text-3xl">🛩️🚁📡 Aircraft Radar</div>
 		<div class="ml-4 text-xs">
 			<div>
 				Built by: Chris J Mears (<a
@@ -134,6 +134,9 @@
 					class="underline"
 					target="_blank">chrisjm</a
 				>)
+				<a href="https://github.com/chrisjm/aircraft-radar" target="_blank" class="underline"
+					>contribute</a
+				>
 			</div>
 			<div>
 				<span>Credits:</span>
