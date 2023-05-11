@@ -1,28 +1,26 @@
-<script>
+<script lang="ts">
 	import * as RtlSdr from 'rtlsdrjs';
 	import Demodulator from 'mode-s-demodulator';
 	import AircraftStore from 'mode-s-aircraft-store';
+	import Icon from 'mdi-svelte';
 	import { sorter } from 'sorters';
 	import { MapLibre, Marker, Popup } from 'svelte-maplibre';
-	import Icon from 'mdi-svelte';
 	import { mdiAirplane } from '@mdi/js';
 
-	let store = new AircraftStore({
-		timeout: 120000 // remove airplane from store if we haven't seen it for 2 minutes
-	});
+	let store = new AircraftStore({ timeout: 30_000 });
 
-	let sdr;
+	let sdr: any;
 	let readSamples = false;
 	let actualSampleRate;
 	let actualCenterFrequency;
-	let intervalId;
-	let radarStore = {};
-	let scanTimer;
-	let scanTimerId;
+	let intervalId: number | undefined;
+	let radarStore: any = {};
+	let scanTimer: string;
+	let scanTimerId: number | undefined;
 
 	const demodulator = new Demodulator();
 
-	function formatTime(minutes, seconds) {
+	function formatTime(minutes: number, seconds: number) {
 		const formattedMinutes = minutes.toString().padStart(2, '0');
 		const formattedSeconds = seconds.toString().padStart(2, '0');
 		return `${formattedMinutes}:${formattedSeconds}`;
@@ -43,85 +41,44 @@
 
 	function endTimer() {
 		clearInterval(scanTimerId);
-		scanTimerId = null;
+		scanTimerId = undefined;
 	}
 
 	function handleEnd() {
-		console.log('Ended scan!');
 		readSamples = false;
 		clearInterval(intervalId);
 		endTimer();
-		intervalId = null;
+		intervalId = undefined;
+		console.log('Ended scan!');
 	}
 
 	function updateRadarStore() {
-		// Update radarStore after collecting data
-		store.getAircrafts().forEach(function (aircraft) {
+		store.getAircrafts().forEach(function (aircraft: any) {
 			radarStore[aircraft.icao] = aircraft;
 		});
 	}
 
 	async function handleStart() {
-		console.log('Start!');
-		//
-		// open the device
-		//
-		// supported options are:
-		// - ppm: frequency correction factor, in parts per million (defaults to 0)
-		// - gain: optional gain in dB, auto gain is used if not specified
-		//
-		await sdr.open({
-			ppm: 0.5
-		});
-
-		//
-		// set sample rate and center frequency in Hz
-		// - returns the actual values set
-		//
-		actualSampleRate = await sdr.setSampleRate(2000000);
-		actualCenterFrequency = await sdr.setCenterFrequency(1090000000);
-
-		//
-		// reset the buffer
-		//
+		console.log('Start scan...');
+		await sdr.open({ ppm: 0.5 });
+		actualSampleRate = await sdr.setSampleRate(2_000_000);
+		actualCenterFrequency = await sdr.setCenterFrequency(1090_000_000);
 		await sdr.resetBuffer();
 
 		readSamples = true;
-
-		// Create timer to run the radarStore update
 		intervalId = setInterval(updateRadarStore, 500);
 		startTimer();
 
 		while (readSamples) {
-			//
-			// read some samples
-			// - returns an ArrayBuffer with the specified number of samples,
-			//   data is interleaved in IQ format
-			//
-			// const samples = await sdr.readSamples(16 * 16384);
 			const samples = await sdr.readSamples(16 * 16384);
-			// console.log(samples);
 			const data = new Uint8Array(samples);
-			// console.log(data);
-			// const message = decoder.parse(data);
-
-			demodulator.process(data, data.length, function (message) {
-				// got new Mode S message from an airplane
+			demodulator.process(data, data.length, function (message: string) {
 				store.addMessage(message);
 			});
-
-			// console.log(message);
 		}
 	}
 
 	async function handleClick() {
-		//
-		// request a device
-		// - displays prompt in browser
-		// - selects first device in Node.js
-		//
-		// RtlSdr.getDevices() can be used to get a list of all RTL SDR's attached to system
-		//
 		sdr = await RtlSdr.requestDevice();
 	}
 </script>
