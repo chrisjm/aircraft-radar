@@ -4,6 +4,8 @@
 	import AircraftStore from 'mode-s-aircraft-store';
 	import { sorter } from 'sorters';
 	import { MapLibre, Marker, Popup } from 'svelte-maplibre';
+	import Icon from 'mdi-svelte';
+	import { mdiAirplane } from '@mdi/js';
 
 	let store = new AircraftStore({
 		timeout: 120000 // remove airplane from store if we haven't seen it for 2 minutes
@@ -200,7 +202,7 @@
 							Speed: {aircraft.speed.toFixed(0)} knots
 						</div>
 						<div class:text-base-200={aircraft.lat === 0 || aircraft.lng === 0}>
-							Lng/Lat: {aircraft.lng.toFixed(4)}/{aircraft.lat.toFixed(4)}
+							Lng/Lat: {aircraft.lng.toFixed(4)} / {aircraft.lat.toFixed(4)}
 						</div>
 					</div>
 				</div>
@@ -221,7 +223,7 @@
 					lngLat={[lng, lat]}
 					class="border-gray-200 border shadow-2xl focus:outline-2 focus:outline-black w-8 h-8 bg-red-300 text-black rounded-full grid place-items-center"
 				>
-					<span class="text-xl" style="transform: rotate({heading - 90}deg);"> ✈ </span>
+					<Icon path={mdiAirplane} color="black" rotate={heading - 45} />
 
 					<Popup openOn="hover" offset={[0, -10]}>
 						<div>
