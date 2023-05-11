@@ -219,25 +219,26 @@
 			center={[-117.1395556, 32.8157222]}
 		>
 			{#each Object.values(radarStore).filter((a) => a.lat && a.lng) as { callsign, speed, lat, lng, heading, altitude, icao } (icao)}
-				<Marker
-					lngLat={[lng, lat]}
-					class="border-gray-200 border shadow-2xl focus:outline-2 focus:outline-black w-8 h-8 bg-red-300 text-black rounded-full grid place-items-center"
-				>
-					<Icon path={mdiAirplane} color="black" rotate={heading - 45} />
-
-					<Popup openOn="hover" offset={[0, -10]}>
-						<div>
-							<span class="font-bold">ID:</span>
-							{#if callsign}<a href="https://flightaware.com/live/flight/{callsign}" target="_blank"
-									>{callsign}</a
-								>{:else}???{/if}({icao})
-						</div>
-						<div><span class="font-bold">Alt:</span> {altitude ?? '?'} ft</div>
-						<div><span class="font-bold">Spd:</span> {speed.toFixed(0) ?? '?'} knots</div>
-						<div><span class="font-bold">Hdg:</span> {heading.toFixed(2)}°</div>
-						<div><span class="font-bold">Lng:</span> {lng.toFixed(6)}</div>
-						<div><span class="font-bold">Lat:</span> {lat.toFixed(6)}</div>
-					</Popup>
+				<Marker lngLat={[lng, lat]}>
+					<div
+						class="p-2 border-blue-200 border focus:outline-2 focus:outline-black text-black rounded-full grid place-items-center bg-blue-50 opacity-80"
+					>
+						<Icon path={mdiAirplane} color="black" rotate={heading - 45} />
+						<Popup openOn="hover" offset={[0, -10]}>
+							<div>
+								<span class="font-bold">ID:</span>
+								{#if callsign}<a
+										href="https://flightaware.com/live/flight/{callsign}"
+										target="_blank">{callsign}</a
+									>{:else}???{/if} ({icao})
+							</div>
+							<div><span class="font-bold">Alt:</span> {altitude ?? '?'} ft</div>
+							<div><span class="font-bold">Spd:</span> {speed.toFixed(0) ?? '?'} knots</div>
+							<div><span class="font-bold">Hdg:</span> {heading.toFixed(2)}°</div>
+							<div><span class="font-bold">Lng:</span> {lng.toFixed(6)}</div>
+							<div><span class="font-bold">Lat:</span> {lat.toFixed(6)}</div>
+						</Popup>
+					</div>
 				</Marker>
 			{/each}
 		</MapLibre>
