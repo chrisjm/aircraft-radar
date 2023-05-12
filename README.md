@@ -2,7 +2,7 @@
 
 Visualizing aircraft information and position using ADS-B aircraft radio frequency and data.
 
-<img width="1440" alt="Screenshot 2023-05-06 at 10 49 54 PM" src="https://user-images.githubusercontent.com/96110/236660175-a3d8c157-acca-4e12-ab02-14c5a2ef3942.png">
+![CleanShot 2023-05-11 at 22 45 55](https://github.com/chrisjm/aircraft-radar/assets/96110/aabf9b55-9d6f-4b20-b18b-5201348d4128)
 
 Note: I'm using [RTL-SDR Blog V3 R860 RTL2832U 1PPM TCXO HF Bias Tee SMA Software Defined Radio with Dipole Antenna Kit](https://www.amazon.com/dp/B0BMKB3L47) (not an affiliation link).
 
