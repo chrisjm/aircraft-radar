@@ -176,11 +176,16 @@
 			center={[-117.1395556, 32.8157222]}
 		>
 			{#each Object.values(radarStore).filter((a) => a.lat && a.lng) as { callsign, speed, lat, lng, heading, altitude, icao } (icao)}
-				<Marker lngLat={[lng, lat]}>
+				<Marker lngLat={[lng, lat]} class="relative">
 					<div
 						class="p-2 border-blue-200 border focus:outline-2 focus:outline-black text-black rounded-full grid place-items-center bg-blue-50 opacity-80"
 					>
 						<Icon path={mdiAirplane} color="black" rotate={heading - 45} />
+						{#if callsign}
+							<div class="absolute -top-4 -right-8 bg-black text-white rounded px-1">
+								{callsign}
+							</div>
+						{/if}
 						<Popup openOn="hover" offset={[0, -10]}>
 							<div>
 								<span class="font-bold">ID:</span>
