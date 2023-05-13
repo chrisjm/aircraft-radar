@@ -1,20 +1,16 @@
 <script lang="ts">
 	import * as RtlSdr from 'rtlsdrjs';
 	import Demodulator from 'mode-s-demodulator';
-	import AircraftStore from 'mode-s-aircraft-store';
 	import Icon from 'mdi-svelte';
 	import { sorter } from 'sorters';
 	import { MapLibre, Marker, Popup } from 'svelte-maplibre';
 	import { mdiAirplane } from '@mdi/js';
-
-	let store = new AircraftStore({ timeout: 30_000 });
+	import { aircraftStore, type ModeSMessage } from '../lib/aircraft-store';
 
 	let sdr: any;
 	let readSamples = false;
 	let actualSampleRate;
 	let actualCenterFrequency;
-	let intervalId: number | undefined;
-	let radarStore: any = {};
 	let scanTimer: string;
 	let scanTimerId: number | undefined;
 
@@ -46,16 +42,8 @@
 
 	function handleEnd() {
 		readSamples = false;
-		clearInterval(intervalId);
 		endTimer();
-		intervalId = undefined;
 		console.log('Ended scan!');
-	}
-
-	function updateRadarStore() {
-		store.getAircrafts().forEach(function (aircraft: any) {
-			radarStore[aircraft.icao] = aircraft;
-		});
 	}
 
 	async function handleStart() {
@@ -64,16 +52,16 @@
 		actualSampleRate = await sdr.setSampleRate(2_000_000);
 		actualCenterFrequency = await sdr.setCenterFrequency(1090_000_000);
 		await sdr.resetBuffer();
+		console.log({ actualSampleRate, actualCenterFrequency });
 
 		readSamples = true;
-		intervalId = setInterval(updateRadarStore, 500);
 		startTimer();
 
 		while (readSamples) {
 			const samples = await sdr.readSamples(16 * 16384);
 			const data = new Uint8Array(samples);
-			demodulator.process(data, data.length, function (message: string) {
-				store.addMessage(message);
+			demodulator.process(data, data.length, function (message: ModeSMessage) {
+				aircraftStore.addMessage(message);
 			});
 		}
 	}
@@ -132,7 +120,7 @@
 			{/if}
 		</div>
 
-		{#each Object.values(radarStore).sort(sorter({ value: 'count', descending: true })) as aircraft}
+		{#each Object.values($aircraftStore?.seenAircraft ?? {}).sort(sorter( { value: 'count', descending: true } )) as aircraft}
 			<div class="card card-compact card-bordered ml-4 shadow-md">
 				<div class="card-body">
 					<h3 class="text-3xl mt-1">
@@ -175,7 +163,7 @@
 			zoom={11}
 			center={[-117.1395556, 32.8157222]}
 		>
-			{#each Object.values(radarStore).filter((a) => a.lat && a.lng) as { callsign, speed, lat, lng, heading, altitude, icao } (icao)}
+			{#each Object.values($aircraftStore?.seenAircraft ?? {}).filter((a) => a.lat && a.lng) as { callsign, speed, lat, lng, heading, altitude, icao } (icao)}
 				<Marker lngLat={[lng, lat]} class="relative">
 					<div
 						class="p-2 border-blue-200 border focus:outline-2 focus:outline-black text-black rounded-full grid place-items-center bg-blue-50 opacity-80"
