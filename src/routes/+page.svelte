@@ -88,10 +88,10 @@
 </script>
 
 <div class="flex w-full">
-	<div class="flex-grow max-w-md flex flex-col gap-4 pr-2 overflow-y-auto h-screen">
-		<div class="ml-4 mt-3 text-3xl">🛩️🚁📡 Aircraft Radar</div>
-		<div class="ml-4 text-xs">
-			<div>
+	<div class="flex-grow max-w-md flex flex-col gap-4 overflow-y-auto h-screen">
+		<div class="m-2 flex flex-col">
+			<span class="text-3xl">🛩️🚁📡 Aircraft Radar</span>
+			<span class="text-xs">
 				Built by: Chris J Mears (<a
 					href="https://github.com/chrisjm"
 					class="underline"
@@ -100,9 +100,111 @@
 				<a href="https://github.com/chrisjm/aircraft-radar" target="_blank" class="underline"
 					>contribute</a
 				>
-			</div>
+			</span>
+		</div>
+		<div class="m-2 text-center">
+			{#if sdr}
+				{#if readSamples}
+					<button class="btn btn-sm btn-error" on:click={handleEnd}>End Scanning</button>
+					<div class="text-base-300 text-sm">
+						{scanTimer ?? '00:00'} ({Math.floor(samplePerSecond)} samples/sec)
+					</div>
+				{:else}
+					<button class="btn btn-primary" on:click={handleStart}>Start Scanning</button>
+				{/if}
+			{:else}
+				<button class="btn" on:click={handleClick}>Register USB Antenna</button>
+			{/if}
+		</div>
+		<div class="m-2 flex-grow overflow-x-auto">
+			{#if Object.values($aircraftStore.seenAircraft ?? {}).length}
+				<table class="table table-compact w-full">
+					<thead>
+						<tr>
+							<th>Callsign</th>
+							<th>Alt/Spd</th>
+							<th>Hdg/Geo</th>
+							<th>Last Seen</th>
+						</tr>
+					</thead>
+					<tbody>
+						{#each Object.values($aircraftStore?.seenAircraft ?? {}).sort(sorter( { value: 'callsign' } )) as aircraft}
+							<tr>
+								<th>
+									<div class="flex flex-col">
+										{#if aircraft.callsign}
+											<a
+												class="text-primary underline"
+												href="https://flightaware.com/live/flight/{aircraft.callsign}"
+												target="_blank">{aircraft.callsign}</a
+											>
+											<span class="text-xs text-base-300 font-normal">(ICAO {aircraft.icao})</span>
+										{:else}<span class="text-base-300 font-normal">ICAO {aircraft.icao}</span>{/if}
+									</div>
+								</th>
+								<td>
+									<div class="flex flex-col gap-0.5">
+										<div class="flex gap-2">
+											<span>{altitudeFormat(aircraft.altitude)} ft</span>
+											{#if aircraft.altitudeTrend > 0}
+												<Icon path={mdiTrendingUp} />
+											{:else if aircraft.altitudeTrend < 0}
+												<Icon path={mdiTrendingDown} />
+											{:else}
+												<Icon path={mdiTrendingNeutral} />
+											{/if}
+										</div>
+										<div class="flex gap-2">
+											<span>{aircraft.speed.toFixed(0)} knots</span>
+											{#if aircraft.speedTrend > 0}
+												<Icon path={mdiTrendingUp} />
+											{:else if aircraft.speedTrend < 0}
+												<Icon path={mdiTrendingDown} />
+											{:else}
+												<Icon path={mdiTrendingNeutral} />
+											{/if}
+										</div>
+									</div>
+								</td>
+								<td>
+									<div class="flex flex-col gap-1">
+										<div class="flex gap-1 items-center">
+											<span>{aircraft.heading.toFixed(0)}°</span>
+											<span
+												><Icon
+													path={mdiArrowUpBoldCircle}
+													rotate={aircraft.heading}
+													size="1rem"
+												/></span
+											>
+										</div>
+										<div class="text-base-300 text-xs flex gap-1 items-center">
+											<Icon size="0.8rem" path={mdiLongitude} />
+											<span>{aircraft.lng.toFixed(4)}</span>
+										</div>
+										<div class="text-base-300 text-xs flex gap-1 items-center">
+											<Icon size="0.8rem" path={mdiLatitude} />
+											<span>{aircraft.lat.toFixed(4)}</span>
+										</div>
+									</div>
+								</td>
+								<td>
+									<div class="flex flex-col gap-1 text-xs">
+										<div>{new Date(aircraft.seen).toLocaleTimeString()}</div>
+										<div class="text-base-300">{aircraft.count} samples</div>
+									</div>
+								</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			{:else}
+				<div class="text-center">No aircraft detected.</div>
+			{/if}
+		</div>
+		<div class="m-2 text-xs">
 			<div>
-				<span>Credits:</span>
+				<span>Additional Credits:</span>
 				<a
 					class="underline"
 					target="_blank"
@@ -121,104 +223,6 @@
 				<a class="underline" target="_blank" href="https://tailwindcss.com/">tailwindcss</a>
 				<a class="underline" target="_blank" href="https://daisyui.com/">daisyUI</a>
 			</div>
-		</div>
-
-		<div class="ml-4 text-center">
-			{#if sdr}
-				{#if readSamples}
-					<button class="btn btn-sm btn-error" on:click={handleEnd}>End Scanning</button>
-					<div class="text-base-300 text-sm">
-						{scanTimer ?? '00:00'} ({Math.floor(samplePerSecond)} samples/sec)
-					</div>
-				{:else}
-					<button class="btn btn-primary" on:click={handleStart}>Start Scanning</button>
-				{/if}
-			{:else}
-				<button class="btn" on:click={handleClick}>Register USB Antenna</button>
-			{/if}
-		</div>
-
-		<div class="overflow-x-auto">
-			<table class="table table-compact w-full">
-				<thead>
-					<tr>
-						<th>Callsign</th>
-						<th>Alt/Spd</th>
-						<th>Hdg/Geo</th>
-						<th>Last Seen</th>
-					</tr>
-				</thead>
-				<tbody>
-					{#each Object.values($aircraftStore?.seenAircraft ?? {}).sort(sorter( { value: 'callsign' } )) as aircraft}
-						<tr>
-							<th>
-								<div class="flex flex-col">
-									{#if aircraft.callsign}
-										<a
-											class="text-primary underline"
-											href="https://flightaware.com/live/flight/{aircraft.callsign}"
-											target="_blank">{aircraft.callsign}</a
-										>
-										<span class="text-xs text-base-300 font-normal">(ICAO {aircraft.icao})</span>
-									{:else}<span class="text-base-300 font-normal">ICAO {aircraft.icao}</span>{/if}
-								</div>
-							</th>
-							<td>
-								<div class="flex flex-col gap-0.5">
-									<div class="flex gap-2">
-										<span>{altitudeFormat(aircraft.altitude)} ft</span>
-										{#if aircraft.altitudeTrend > 0}
-											<Icon path={mdiTrendingUp} />
-										{:else if aircraft.altitudeTrend < 0}
-											<Icon path={mdiTrendingDown} />
-										{:else}
-											<Icon path={mdiTrendingNeutral} />
-										{/if}
-									</div>
-									<div class="flex gap-2">
-										<span>{aircraft.speed.toFixed(0)} knots</span>
-										{#if aircraft.speedTrend > 0}
-											<Icon path={mdiTrendingUp} />
-										{:else if aircraft.speedTrend < 0}
-											<Icon path={mdiTrendingDown} />
-										{:else}
-											<Icon path={mdiTrendingNeutral} />
-										{/if}
-									</div>
-								</div>
-							</td>
-							<td>
-								<div class="flex flex-col gap-1">
-									<div class="flex gap-1 items-center">
-										<span>{aircraft.heading.toFixed(0)}°</span>
-										<span
-											><Icon
-												path={mdiArrowUpBoldCircle}
-												rotate={aircraft.heading}
-												size="1rem"
-											/></span
-										>
-									</div>
-									<div class="text-base-300 text-xs flex gap-1 items-center">
-										<Icon size="0.8rem" path={mdiLongitude} />
-										<span>{aircraft.lng.toFixed(4)}</span>
-									</div>
-									<div class="text-base-300 text-xs flex gap-1 items-center">
-										<Icon size="0.8rem" path={mdiLatitude} />
-										<span>{aircraft.lat.toFixed(4)}</span>
-									</div>
-								</div>
-							</td>
-							<td>
-								<div class="flex flex-col gap-1 text-xs">
-									<div>{new Date(aircraft.seen).toLocaleTimeString()}</div>
-									<div class="text-base-300">{aircraft.count} samples</div>
-								</div>
-							</td>
-						</tr>
-					{/each}
-				</tbody>
-			</table>
 		</div>
 	</div>
 	<div class="flex-grow h-full">
