@@ -3,7 +3,7 @@ import { writable } from 'svelte/store';
 
 export interface ModeSMessage {
 	aircraftType?: number;
-	altitude?: number;
+	altitude: number;
 	ca?: number;
 	callsign: string;
 	crc: number;
@@ -14,7 +14,7 @@ export interface ModeSMessage {
 	ewVelocity: number;
 	fflag?: number;
 	fs?: number;
-	heading?: number;
+	heading: number;
 	headingIsValid?: boolean;
 	icao: number;
 	identity: number;
@@ -26,28 +26,32 @@ export interface ModeSMessage {
 	nsDir?: number;
 	nsVelocity?: number;
 	phaseCorrected: boolean;
-	rawLatitude?: number;
-	rawLongitude?: number;
-	speed?: number;
+	rawLatitude: number;
+	rawLongitude: number;
+	speed: number;
 	tflag?: number;
 	um: number;
-	unit?: number;
+	unit: number;
 	vertRate: number;
 	vertRateSign: number;
 	vertRateSource: number;
 }
 
 export interface Aircraft {
+	aircraftType?: number;
 	callsign: string;
 	icao: number;
 	count: number;
 	seen: number;
 	altitude: number;
+	altitudeTrend: number;
 	unit: number;
 	speed: number;
+	speedTrend: number;
 	heading: number;
 	lat: number;
 	lng: number;
+	geoHistory: number[][];
 	_oddCprLat: number;
 	_oddCprLng: number;
 	_oddCprTime: number;
@@ -69,18 +73,22 @@ const defaultOptions = {
 function createAircraftStore() {
 	const { subscribe, set, update } = writable<AircraftStore>(defaultOptions);
 
-	function updateAircraft(msg: any, n: AircraftStore) {
+	function updateAircraft(msg: ModeSMessage, n: AircraftStore) {
 		const aircraft = n.seenAircraft[msg.icao] ?? {
 			callsign: '',
+			airCraftType: 0,
 			icao: 0,
 			count: 0,
 			seen: 0,
 			altitude: 0,
+			altitudeTrend: 0,
 			unit: 0,
 			speed: 0,
+			speedTrend: 0,
 			heading: 0,
 			lat: 0,
 			lng: 0,
+			geoHistory: [],
 			_oddCprLat: 0,
 			_oddCprLng: 0,
 			_oddCprTime: 0,
@@ -92,15 +100,20 @@ function createAircraftStore() {
 		aircraft.count++;
 		aircraft.seen = Date.now();
 		aircraft.icao = msg.icao;
+		aircraft.aircraftType = msg.aircraftType ?? aircraft.aircraftType ?? undefined;
 
 		if (msg.msgtype === 0 || msg.msgtype === 4 || msg.msgtype === 20) {
+			const oldAltitude = aircraft.altitude;
 			aircraft.altitude = msg.altitude;
+			aircraft.altitudeTrend = aircraft.altitude - oldAltitude;
 			aircraft.unit = msg.unit;
 		} else if (msg.msgtype === 17) {
 			if (msg.metype >= 1 && msg.metype <= 4) {
 				aircraft.callsign = msg.callsign;
 			} else if (msg.metype >= 9 && msg.metype <= 18) {
+				const oldAltitude = aircraft.altitude;
 				aircraft.altitude = msg.altitude;
+				aircraft.altitudeTrend = aircraft.altitude - oldAltitude;
 				aircraft.unit = msg.unit;
 				if (msg.fflag) {
 					aircraft._oddCprLat = msg.rawLatitude;
@@ -120,12 +133,18 @@ function createAircraftStore() {
 				}
 			} else if (msg.metype === 19) {
 				if (msg.mesub === 1 || msg.mesub === 2) {
+					const oldSpeed = aircraft.speed;
 					aircraft.speed = msg.speed;
+					aircraft.speedTrend = aircraft.speed - oldSpeed;
 					aircraft.heading = msg.heading;
 				}
 			}
 		}
 
+		if (aircraft.lng && aircraft.lat) {
+			aircraft.geoHistory.push([aircraft.lng, aircraft.lat]);
+			aircraft.geoHistory = aircraft.geoHistory.slice(-100);
+		}
 		n.seenAircraft[aircraft.icao] = aircraft;
 
 		return n;
