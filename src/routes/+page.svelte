@@ -25,7 +25,7 @@
 	let sampleCount = 0;
 	let samplePerSecond = 0;
 
-	const altitudeFormat = format(',.2r');
+	const numberFormat = format(',.2r');
 	const demodulator = new Demodulator();
 
 	function formatTime(minutes: number, seconds: number) {
@@ -144,24 +144,24 @@
 								</th>
 								<td>
 									<div class="flex flex-col gap-0.5">
-										<div class="flex gap-2">
-											<span>{altitudeFormat(aircraft.altitude)} ft</span>
+										<div class="flex gap-2 items-center">
+											<span>{numberFormat(aircraft.altitude)} ft</span>
 											{#if aircraft.altitudeTrend > 0}
-												<Icon path={mdiTrendingUp} />
+												<Icon size="0.8rem" path={mdiTrendingUp} />
 											{:else if aircraft.altitudeTrend < 0}
-												<Icon path={mdiTrendingDown} />
+												<Icon size="0.8rem" path={mdiTrendingDown} />
 											{:else}
-												<Icon path={mdiTrendingNeutral} />
+												<Icon size="0.8rem" path={mdiTrendingNeutral} />
 											{/if}
 										</div>
-										<div class="flex gap-2">
+										<div class="flex gap-2 items-center">
 											<span>{aircraft.speed.toFixed(0)} knots</span>
 											{#if aircraft.speedTrend > 0}
-												<Icon path={mdiTrendingUp} />
+												<Icon size="0.8rem" path={mdiTrendingUp} />
 											{:else if aircraft.speedTrend < 0}
-												<Icon path={mdiTrendingDown} />
+												<Icon size="0.8rem" path={mdiTrendingDown} />
 											{:else}
-												<Icon path={mdiTrendingNeutral} />
+												<Icon size="0.8rem" path={mdiTrendingNeutral} />
 											{/if}
 										</div>
 									</div>
@@ -191,7 +191,7 @@
 								<td>
 									<div class="flex flex-col gap-1 text-xs">
 										<div>{new Date(aircraft.seen).toLocaleTimeString()}</div>
-										<div class="text-base-300">{aircraft.count} samples</div>
+										<div class="text-base-300">{numberFormat(aircraft.count)} samples</div>
 									</div>
 								</td>
 							</tr>
