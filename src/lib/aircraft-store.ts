@@ -153,19 +153,20 @@ function createAircraftStore() {
 	return {
 		subscribe,
 		addMessage: (msg: ModeSMessage) => update((n) => updateAircraft(msg, n)),
+		prune: () => update((n) => prune(n)),
 		reset: set(defaultOptions)
 	};
 }
 
-function prune(aircraftList: Record<string, Aircraft>, timeout: number) {
-	const threshold = Date.now() - timeout;
-	Object.keys(aircraftList).forEach((icao) => {
-		const aircraft = aircraftList[icao];
+function prune(store: AircraftStore) {
+	const threshold = Date.now() - store.timeout;
+	Object.keys(store.seenAircraft).forEach((icao) => {
+		const aircraft = store.seenAircraft[icao];
 		if (aircraft.seen < threshold) {
-			delete aircraftList[icao];
+			delete store.seenAircraft[icao];
 		}
 	});
-	return aircraftList;
+	return store;
 }
 
 export const aircraftStore = createAircraftStore();

@@ -70,6 +70,7 @@
 			demodulator.process(data, data.length, function (message: ModeSMessage) {
 				sampleCount++;
 				aircraftStore.addMessage(message);
+				aircraftStore.prune();
 			});
 		}
 	}
@@ -80,7 +81,7 @@
 </script>
 
 <div class="flex w-full">
-	<div class="flex-grow max-w-sm flex flex-col gap-4 pr-2 overflow-y-auto h-screen">
+	<div class="flex-grow max-w-md flex flex-col gap-4 pr-2 overflow-y-auto h-screen">
 		<div class="ml-4 mt-3 text-3xl">🛩️🚁📡 Aircraft Radar</div>
 		<div class="ml-4 text-xs">
 			<div>
