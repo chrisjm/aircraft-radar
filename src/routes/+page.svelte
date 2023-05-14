@@ -5,7 +5,15 @@
 	import { sorter } from 'sorters';
 	import { format } from 'd3-format';
 	import { LineLayer, MapLibre, Marker, Popup, GeoJSON } from 'svelte-maplibre';
-	import { mdiAirplane, mdiTrendingDown, mdiTrendingNeutral, mdiTrendingUp } from '@mdi/js';
+	import {
+		mdiAirplane,
+		mdiArrowUpBoldCircle,
+		mdiLatitude,
+		mdiLongitude,
+		mdiTrendingDown,
+		mdiTrendingNeutral,
+		mdiTrendingUp
+	} from '@mdi/js';
 	import { aircraftStore, type ModeSMessage } from '../lib/aircraft-store';
 
 	let sdr: any;
@@ -16,7 +24,6 @@
 	let scanTimerId: number | undefined;
 	let sampleCount = 0;
 	let samplePerSecond = 0;
-	let tableView = true;
 
 	const altitudeFormat = format(',.2r');
 	const demodulator = new Demodulator();
@@ -131,38 +138,35 @@
 			{/if}
 		</div>
 
-		{#if tableView}
-			<div class="overflow-x-auto">
-				<table class="table table-compact w-full">
-					<thead>
+		<div class="overflow-x-auto">
+			<table class="table table-compact w-full">
+				<thead>
+					<tr>
+						<th>Callsign</th>
+						<th>Alt/Spd</th>
+						<th>Hdg/Geo</th>
+						<th>Last Seen</th>
+					</tr>
+				</thead>
+				<tbody>
+					{#each Object.values($aircraftStore?.seenAircraft ?? {}).sort(sorter( { value: 'callsign' } )) as aircraft}
 						<tr>
-							<th>Callsign</th>
-							<th>Altitude (ft)</th>
-							<th>Speed (knots)</th>
-							<th>Heading</th>
-							<th>Last Seen</th>
-							<th>Count</th>
-							<th>Lng / Lat</th>
-						</tr>
-					</thead>
-					<tbody>
-						{#each Object.values($aircraftStore?.seenAircraft ?? {}).sort(sorter( { value: 'callsign', descending: true } )) as aircraft}
-							<tr>
-								<th>
-									<div class="flex flex-col">
-										{#if aircraft.callsign}
-											<a
-												class="text-primary underline"
-												href="https://flightaware.com/live/flight/{aircraft.callsign}"
-												target="_blank">{aircraft.callsign}</a
-											>
-											<span class="text-xs text-base-300">(ICAO {aircraft.icao})</span>
-										{:else}<span class="text-base-300">ICAO {aircraft.icao}</span>{/if}
-									</div>
-								</th>
-								<td>
+							<th>
+								<div class="flex flex-col">
+									{#if aircraft.callsign}
+										<a
+											class="text-primary underline"
+											href="https://flightaware.com/live/flight/{aircraft.callsign}"
+											target="_blank">{aircraft.callsign}</a
+										>
+										<span class="text-xs text-base-300 font-normal">(ICAO {aircraft.icao})</span>
+									{:else}<span class="text-base-300 font-normal">ICAO {aircraft.icao}</span>{/if}
+								</div>
+							</th>
+							<td>
+								<div class="flex flex-col gap-0.5">
 									<div class="flex gap-2">
-										<span>{altitudeFormat(aircraft.altitude)}</span>
+										<span>{altitudeFormat(aircraft.altitude)} ft</span>
 										{#if aircraft.altitudeTrend > 0}
 											<Icon path={mdiTrendingUp} />
 										{:else if aircraft.altitudeTrend < 0}
@@ -171,10 +175,8 @@
 											<Icon path={mdiTrendingNeutral} />
 										{/if}
 									</div>
-								</td>
-								<td>
 									<div class="flex gap-2">
-										<span>{aircraft.speed.toFixed(0)}</span>
+										<span>{aircraft.speed.toFixed(0)} knots</span>
 										{#if aircraft.speedTrend > 0}
 											<Icon path={mdiTrendingUp} />
 										{:else if aircraft.speedTrend < 0}
@@ -183,65 +185,41 @@
 											<Icon path={mdiTrendingNeutral} />
 										{/if}
 									</div>
-								</td>
-								<td>{aircraft.heading.toFixed(0)}°</td>
-								<td>{new Date(aircraft.seen).toLocaleString()}</td>
-								<td>{aircraft.count}</td>
-								<td>{aircraft.lng.toFixed(4)} / {aircraft.lat.toFixed(4)}</td>
-							</tr>
-						{/each}
-					</tbody>
-				</table>
-			</div>
-		{:else}
-			{#each Object.values($aircraftStore?.seenAircraft ?? {}).sort(sorter( { value: 'callsign', descending: true } )) as aircraft}
-				<div class="card card-compact card-bordered ml-4 shadow-md">
-					<div class="card-body">
-						<h3 class="text-3xl mt-1">
-							{#if aircraft.callsign}
-								<a
-									class="text-primary underline"
-									href="https://flightaware.com/live/flight/{aircraft.callsign}"
-									target="_blank">{aircraft.callsign}</a
-								>
-								<span class="text-xs text-base-300">(ICAO {aircraft.icao})</span>
-							{:else}<span class="text-base-300">ICAO {aircraft.icao}</span>{/if}
-						</h3>
-						<div class="text-xs text-base-300">
-							Last seen: {new Date(aircraft.seen).toLocaleString()} ({aircraft.count})
-						</div>
-						<div class="flex flex-col mt-2">
-							<div class="flex gap-1" class:text-base-200={aircraft.altitude === 0}>
-								<span>Altitude: {altitudeFormat(aircraft.altitude)} ft</span>
-								{#if aircraft.altitudeTrend > 0}
-									<Icon path={mdiTrendingUp} />
-								{:else if aircraft.altitudeTrend < 0}
-									<Icon path={mdiTrendingDown} />
-								{:else}
-									<Icon path={mdiTrendingNeutral} />
-								{/if}
-							</div>
-							<div class:text-base-200={aircraft.heading === 0}>
-								Heading: {aircraft.heading.toFixed(0)}°
-							</div>
-							<div class="flex gap-1" class:text-base-200={aircraft.speed === 0}>
-								<span>Speed: {aircraft.speed.toFixed(0)} knots</span>
-								{#if aircraft.speedTrend > 0}
-									<Icon path={mdiTrendingUp} />
-								{:else if aircraft.speedTrend < 0}
-									<Icon path={mdiTrendingDown} />
-								{:else}
-									<Icon path={mdiTrendingNeutral} />
-								{/if}
-							</div>
-							<div class:text-base-200={aircraft.lat === 0 || aircraft.lng === 0}>
-								Lng/Lat: {aircraft.lng.toFixed(4)} / {aircraft.lat.toFixed(4)}
-							</div>
-						</div>
-					</div>
-				</div>
-			{/each}
-		{/if}
+								</div>
+							</td>
+							<td>
+								<div class="flex flex-col gap-1">
+									<div class="flex gap-1 items-center">
+										<span>{aircraft.heading.toFixed(0)}°</span>
+										<span
+											><Icon
+												path={mdiArrowUpBoldCircle}
+												rotate={aircraft.heading}
+												size="1rem"
+											/></span
+										>
+									</div>
+									<div class="text-base-300 text-xs flex gap-1 items-center">
+										<Icon size="0.8rem" path={mdiLongitude} />
+										<span>{aircraft.lng.toFixed(4)}</span>
+									</div>
+									<div class="text-base-300 text-xs flex gap-1 items-center">
+										<Icon size="0.8rem" path={mdiLatitude} />
+										<span>{aircraft.lat.toFixed(4)}</span>
+									</div>
+								</div>
+							</td>
+							<td>
+								<div class="flex flex-col gap-1 text-xs">
+									<div>{new Date(aircraft.seen).toLocaleTimeString()}</div>
+									<div class="text-base-300">{aircraft.count} samples</div>
+								</div>
+							</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		</div>
 	</div>
 	<div class="flex-grow h-full">
 		<MapLibre

@@ -5,7 +5,7 @@ export interface ModeSMessage {
 	aircraftType?: number;
 	altitude: number;
 	ca?: number;
-	callsign: string;
+	callsign?: string | null;
 	crc: number;
 	crcOk: boolean;
 	dr: number;
@@ -39,7 +39,7 @@ export interface ModeSMessage {
 
 export interface Aircraft {
 	aircraftType?: number;
-	callsign: string;
+	callsign?: string | null;
 	icao: number;
 	count: number;
 	seen: number;
@@ -75,7 +75,7 @@ function createAircraftStore() {
 
 	function updateAircraft(msg: ModeSMessage, n: AircraftStore) {
 		const aircraft = n.seenAircraft[msg.icao] ?? {
-			callsign: '',
+			callsign: null,
 			airCraftType: 0,
 			icao: 0,
 			count: 0,
@@ -109,7 +109,7 @@ function createAircraftStore() {
 			aircraft.unit = msg.unit;
 		} else if (msg.msgtype === 17) {
 			if (msg.metype >= 1 && msg.metype <= 4) {
-				aircraft.callsign = msg.callsign;
+				aircraft.callsign = msg.callsign === '' ? null : msg.callsign;
 			} else if (msg.metype >= 9 && msg.metype <= 18) {
 				const oldAltitude = aircraft.altitude;
 				aircraft.altitude = msg.altitude;
