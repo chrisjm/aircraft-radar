@@ -15,6 +15,7 @@
 		mdiTrendingUp
 	} from '@mdi/js';
 	import { aircraftStore, type ModeSMessage } from '../lib/aircraft-store';
+	import { onMount } from 'svelte';
 
 	let sdr: any;
 	let readSamples = false;
@@ -24,6 +25,22 @@
 	let scanTimerId: number | undefined;
 	let sampleCount = 0;
 	let samplePerSecond = 0;
+	let currentCoordinates: GeolocationCoordinates;
+
+	const options = {
+		enableHighAccuracy: true,
+		timeout: 5000,
+		maximumAge: 0
+	};
+
+	function success(pos: GeolocationPosition) {
+		currentCoordinates = pos.coords;
+
+		console.log('Your current position is:');
+		console.log(`Latitude : ${currentCoordinates.latitude}`);
+		console.log(`Longitude: ${currentCoordinates.longitude}`);
+		console.log(`More or less ${currentCoordinates.accuracy} meters.`);
+	}
 
 	const numberFormat = format(',.2r');
 	const demodulator = new Demodulator();
@@ -85,6 +102,10 @@
 	async function handleClick() {
 		sdr = await RtlSdr.requestDevice();
 	}
+
+	onMount(() => {
+		navigator.geolocation.getCurrentPosition(success, (err) => console.log(err), options);
+	});
 </script>
 
 <div class="flex w-full">
@@ -231,7 +252,9 @@
 			class="relative w-full aspect-[9/16] h-screen"
 			standardControls
 			zoom={11}
-			center={[-117.1395556, 32.8157222]}
+			center={currentCoordinates
+				? [currentCoordinates.longitude, currentCoordinates.latitude]
+				: undefined}
 		>
 			{#each Object.values($aircraftStore?.seenAircraft ?? {}).filter((a) => a.lat && a.lng) as { callsign, speed, lat, lng, heading, altitude, icao, geoHistory } (icao)}
 				{@const data = {
