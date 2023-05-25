@@ -52,6 +52,8 @@ export interface Aircraft {
 	lat: number;
 	lng: number;
 	geoHistory: number[][];
+	pathId?: string;
+	pathData?: any; // TODO: This should be GeoJSON
 	_oddCprLat: number;
 	_oddCprLng: number;
 	_oddCprTime: number;
@@ -144,7 +146,25 @@ function createAircraftStore() {
 		if (aircraft.lng && aircraft.lat) {
 			aircraft.geoHistory.push([aircraft.lng, aircraft.lat]);
 			aircraft.geoHistory = aircraft.geoHistory.slice(-100);
+
+			if (aircraft.geoHistory.length) {
+				aircraft.pathData = {
+					type: 'Feature',
+					properties: {
+						name: 'Path'
+					},
+					geometry: {
+						type: 'LineString',
+						coordinates: [...aircraft.geoHistory.map((h) => [h[0], h[1]])]
+					}
+				};
+			}
 		}
+
+		aircraft.pathId = aircraft.callsign
+			? `${aircraft.callsign}-${aircraft.icao}-path`
+			: `${aircraft.icao}-path`;
+
 		n.seenAircraft[aircraft.icao] = aircraft;
 
 		return n;

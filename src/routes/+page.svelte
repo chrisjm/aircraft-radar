@@ -35,11 +35,6 @@
 
 	function success(pos: GeolocationPosition) {
 		currentCoordinates = pos.coords;
-
-		console.log('Your current position is:');
-		console.log(`Latitude : ${currentCoordinates.latitude}`);
-		console.log(`Longitude: ${currentCoordinates.longitude}`);
-		console.log(`More or less ${currentCoordinates.accuracy} meters.`);
 	}
 
 	const numberFormat = format(',.2r');
@@ -83,7 +78,6 @@
 		actualSampleRate = await sdr.setSampleRate(2_000_000);
 		actualCenterFrequency = await sdr.setCenterFrequency(1090_000_000);
 		await sdr.resetBuffer();
-		console.log({ actualSampleRate, actualCenterFrequency });
 
 		readSamples = true;
 		startTimer();
@@ -256,18 +250,8 @@
 				? [currentCoordinates.longitude, currentCoordinates.latitude]
 				: undefined}
 		>
-			{#each Object.values($aircraftStore?.seenAircraft ?? {}).filter((a) => a.lat && a.lng) as { callsign, speed, lat, lng, heading, altitude, icao, geoHistory } (icao)}
-				{@const data = {
-					type: 'Feature',
-					properties: {
-						name: 'Path'
-					},
-					geometry: {
-						type: 'LineString',
-						coordinates: [...geoHistory.map((h) => [h[0], h[1]])]
-					}
-				}}
-				<GeoJSON id="{icao}-path" {data}>
+			{#each Object.values($aircraftStore?.seenAircraft ?? {}).filter((a) => a.lat && a.lng) as { callsign, speed, lat, lng, heading, altitude, icao, pathId, pathData } (icao)}
+				<GeoJSON id={pathId} data={pathData}>
 					<LineLayer
 						layout={{ 'line-cap': 'round', 'line-join': 'round' }}
 						paint={{
