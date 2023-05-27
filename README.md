@@ -1,6 +1,6 @@
 # 🛩️📡 Aircraft Radar
 
-Visualizing aircraft information and position using ADS-B aircraft radio frequency and data.
+Visualizing aircraft information and position using Web USB and ADS-B aircraft radio frequency and data.
 
 ![CleanShot 2023-05-26 at 20 25 47](https://github.com/chrisjm/aircraft-radar/assets/96110/008156bc-33a7-4457-afed-6fc489005885)
 
@@ -27,7 +27,7 @@ npm run build
 
 ## Credit
 
-* [Aircraft Radar System SRD Web USB by Charlie Gerard](https://charliegerard.dev/blog/aircraft-radar-system-rtl-sdr-web-usb/)
+* [Aircraft Radar System SDR Web USB by Charlie Gerard](https://charliegerard.dev/blog/aircraft-radar-system-rtl-sdr-web-usb/)
 * [rtlsdr.js](https://github.com/sandeepmistry/rtlsdrjs)
 * [mode-s-demodulator](https://github.com/watson/mode-s-demodulator)
 * [svelte-maplibre](https://github.com/dimfeld/svelte-maplibre)
