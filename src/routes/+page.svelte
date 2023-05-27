@@ -97,6 +97,38 @@
 		sdr = await RtlSdr.requestDevice();
 	}
 
+	// Linear Interpolation
+	function normalize(
+		inputMin: number,
+		inputMax: number,
+		outputMin: number,
+		outputMax: number,
+		input: number
+	) {
+		return Math.ceil(
+			((input - inputMin) / (inputMax - inputMin)) * (outputMax - outputMin) + outputMin
+		);
+	}
+
+	function markerColor(input: number): string {
+		const minimum = 0;
+		const maximum = 45_000;
+		const markerStyle = [
+			'bg-sky-50 z-0',
+			'bg-sky-100 z-10',
+			'bg-sky-200 z-10',
+			'bg-sky-300 z-20',
+			'bg-sky-400 z-20',
+			'bg-sky-500 z-30 !text-white',
+			'bg-sky-600 z-30 !text-white',
+			'bg-sky-700 z-40 !text-white',
+			'bg-sky-800 z-40 !text-white',
+			'bg-sky-900 z-50 !text-white',
+			'bg-sky-950 z-50 !text-white'
+		];
+		return markerStyle[normalize(minimum, maximum, 0, markerStyle.length, input)];
+	}
+
 	onMount(() => {
 		navigator.geolocation.getCurrentPosition(success, (err) => console.log(err), options);
 	});
@@ -263,9 +295,11 @@
 				</GeoJSON>
 				<Marker lngLat={[lng, lat]} class="relative">
 					<div
-						class="p-2 border-blue-200 border focus:outline-2 focus:outline-black text-black rounded-full grid place-items-center bg-blue-50 opacity-80"
+						class={`p-2 border-blue-200 border focus:outline-2 focus:outline-black text-black rounded-full grid place-items-center opacity-80 ${markerColor(
+							altitude ?? 0
+						)}`}
 					>
-						<Icon path={mdiAirplane} color="black" rotate={heading - 45} />
+						<Icon path={mdiAirplane} rotate={heading - 45} />
 						{#if callsign}
 							<div class="absolute -top-4 -right-8 bg-black text-white rounded px-1">
 								{callsign}
