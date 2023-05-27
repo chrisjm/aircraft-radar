@@ -250,8 +250,8 @@
 				? [currentCoordinates.longitude, currentCoordinates.latitude]
 				: undefined}
 		>
-			{#each Object.values($aircraftStore?.seenAircraft ?? {}).filter((a) => a.lat && a.lng) as { callsign, speed, lat, lng, heading, altitude, icao, pathId, pathData } (icao)}
-				<GeoJSON id={pathId} data={pathData}>
+			{#each Object.values($aircraftStore?.seenAircraft ?? {}).filter((a) => a.lat && a.lng) as { callsign, speed, lat, lng, heading, altitude, icao, pathData } (icao)}
+				<GeoJSON data={pathData ?? ''} generateId={true}>
 					<LineLayer
 						layout={{ 'line-cap': 'round', 'line-join': 'round' }}
 						paint={{

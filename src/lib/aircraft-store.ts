@@ -1,3 +1,4 @@
+import type { GeoJSON } from 'geojson';
 import { decodeCPR } from './cpr-decoder.js';
 import { writable } from 'svelte/store';
 
@@ -52,8 +53,7 @@ export interface Aircraft {
 	lat: number;
 	lng: number;
 	geoHistory: number[][];
-	pathId?: string;
-	pathData?: any; // TODO: This should be GeoJSON
+	pathData?: GeoJSON;
 	_oddCprLat: number;
 	_oddCprLng: number;
 	_oddCprTime: number;
@@ -68,7 +68,7 @@ export interface AircraftStore {
 }
 
 const defaultOptions = {
-	timeout: 30_000,
+	timeout: 10_000,
 	seenAircraft: {}
 };
 
@@ -160,10 +160,6 @@ function createAircraftStore() {
 				};
 			}
 		}
-
-		aircraft.pathId = aircraft.callsign
-			? `${aircraft.callsign}-${aircraft.icao}-path`
-			: `${aircraft.icao}-path`;
 
 		n.seenAircraft[aircraft.icao] = aircraft;
 
