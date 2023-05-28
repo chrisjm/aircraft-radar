@@ -119,7 +119,7 @@
 			'bg-sky-200 z-10',
 			'bg-sky-300 z-20',
 			'bg-sky-400 z-20',
-			'bg-sky-500 z-30 !text-white',
+			'bg-sky-500 z-30',
 			'bg-sky-600 z-30 !text-white',
 			'bg-sky-700 z-40 !text-white',
 			'bg-sky-800 z-40 !text-white',
@@ -175,7 +175,9 @@
 						</tr>
 					</thead>
 					<tbody>
-						{#each Object.values($aircraftStore?.seenAircraft ?? {}).sort(sorter( { value: 'callsign' } )) as aircraft}
+						{#each Object.values($aircraftStore?.seenAircraft ?? {})
+							.filter((a) => a.lat && a.lng)
+							.sort(sorter({ value: 'callsign', descending: true })) as aircraft}
 							<tr>
 								<th>
 									<div class="flex flex-col">
