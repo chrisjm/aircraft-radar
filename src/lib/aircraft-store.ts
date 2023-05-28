@@ -63,13 +63,15 @@ export interface Aircraft {
 }
 
 export interface AircraftStore {
-	timeout: number;
+	pathLength: number;
 	seenAircraft: Record<string, Aircraft>;
+	timeout: number;
 }
 
 const defaultOptions = {
-	timeout: 10_000,
-	seenAircraft: {}
+	pathLength: 200,
+	seenAircraft: {},
+	timeout: 30_000
 };
 
 function createAircraftStore() {
@@ -145,7 +147,7 @@ function createAircraftStore() {
 
 		if (aircraft.lng && aircraft.lat) {
 			aircraft.geoHistory.push([aircraft.lng, aircraft.lat]);
-			aircraft.geoHistory = aircraft.geoHistory.slice(-100);
+			aircraft.geoHistory = aircraft.geoHistory.slice(-n.pathLength);
 
 			if (aircraft.geoHistory.length) {
 				aircraft.pathData = {
