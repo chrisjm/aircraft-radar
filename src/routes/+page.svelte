@@ -130,6 +130,10 @@
 		return markerStyle[normalize(minimum, maximum, 0, markerStyle.length, input)];
 	}
 
+	$: filteredTable = Object.values($aircraftStore?.seenAircraft ?? {}).filter(
+		(a) => a.lat && a.lng
+	);
+
 	onMount(() => {
 		navigator.geolocation.getCurrentPosition(success, (err) => console.log(err), options);
 	});
@@ -165,7 +169,7 @@
 			{/if}
 		</div>
 		<div class="m-2 flex-grow overflow-x-auto">
-			{#if Object.values($aircraftStore.seenAircraft ?? {}).length}
+			{#if filteredTable.length}
 				<table class="table table-compact w-full">
 					<thead>
 						<tr>
@@ -176,9 +180,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						{#each Object.values($aircraftStore?.seenAircraft ?? {})
-							.filter((a) => a.lat && a.lng)
-							.sort(sorter({ value: (v) => v.callsign ?? null })) as aircraft}
+						{#each filteredTable.sort(sorter({ value: 'callsign' })) as aircraft}
 							<tr>
 								<th>
 									<div class="flex flex-col">
@@ -206,7 +208,11 @@
 								<td>
 									<div class="flex flex-col gap-0.5">
 										<div class="flex gap-2 items-center">
-											<span>{numberFormat(aircraft.altitude)} ft</span>
+											{#if aircraft.altitude >= 1000}
+												<span>FL{Math.floor(aircraft.altitude / 100).toString().padStart(3, '0')}</span>
+											{:else}
+												<span>{numberFormat(aircraft.altitude)} ft</span>
+											{/if}
 											{#if aircraft.altitudeTrend > 0}
 												<Icon size="0.8rem" path={mdiTrendingUp} />
 											{:else if aircraft.altitudeTrend < 0}
