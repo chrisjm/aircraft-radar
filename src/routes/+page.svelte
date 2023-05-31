@@ -14,6 +14,7 @@
 		mdiTrendingNeutral,
 		mdiTrendingUp
 	} from '@mdi/js';
+	import { siSouthwestairlines, siUnitedairlines, siAmericanairlines } from 'simple-icons';
 	import { aircraftStore, type ModeSMessage } from '../lib/aircraft-store';
 	import { onMount } from 'svelte';
 
@@ -177,16 +178,27 @@
 					<tbody>
 						{#each Object.values($aircraftStore?.seenAircraft ?? {})
 							.filter((a) => a.lat && a.lng)
-							.sort(sorter({ value: 'callsign', descending: true })) as aircraft}
+							.sort(sorter({ value: (v) => v.callsign ?? null })) as aircraft}
 							<tr>
 								<th>
 									<div class="flex flex-col">
 										{#if aircraft.callsign}
 											<a
-												class="text-primary underline"
+												class="flex items-center gap-1"
 												href="https://flightaware.com/live/flight/{aircraft.callsign}"
-												target="_blank">{aircraft.callsign}</a
+												target="_blank"
 											>
+												<span class="text-primary underline">
+													{aircraft.callsign}
+												</span>
+												{#if aircraft.callsign.toLowerCase().startsWith('swa')}
+													<Icon path={siSouthwestairlines.path} size="0.8rem" color="#304CB2" />
+												{:else if aircraft.callsign.toLowerCase().startsWith('ual')}
+													<Icon path={siUnitedairlines.path} size="0.8rem" color="#002244" />
+												{:else if aircraft.callsign.toLowerCase().startsWith('aal')}
+													<Icon path={siAmericanairlines.path} size="0.8rem" color="#0078D2" />
+												{/if}
+											</a>
 											<span class="text-xs text-base-300 font-normal">(ICAO {aircraft.icao})</span>
 										{:else}<span class="text-base-300 font-normal">ICAO {aircraft.icao}</span>{/if}
 									</div>
@@ -285,44 +297,46 @@
 				: undefined}
 		>
 			{#each Object.values($aircraftStore?.seenAircraft ?? {}).filter((a) => a.lat && a.lng) as { callsign, speed, lat, lng, heading, altitude, icao, pathData } (icao)}
-				<GeoJSON data={pathData ?? ''} generateId={true}>
-					<LineLayer
-						layout={{ 'line-cap': 'round', 'line-join': 'round' }}
-						paint={{
-							'line-width': 2,
-							'line-color': '#008800',
-							'line-opacity': 0.8
-						}}
-					/>
-				</GeoJSON>
-				<Marker lngLat={[lng, lat]} class="relative">
-					<div
-						class={`p-2 border-blue-200 border focus:outline-2 focus:outline-black text-black rounded-full grid place-items-center opacity-80 ${markerColor(
-							altitude ?? 0
-						)}`}
-					>
-						<Icon path={mdiAirplane} rotate={heading - 45} />
-						{#if callsign}
-							<div class="absolute -top-4 -right-8 bg-black text-white rounded px-1">
-								{callsign}
-							</div>
-						{/if}
-						<Popup openOn="hover" offset={[0, -10]}>
-							<div>
-								<span class="font-bold">ID:</span>
-								{#if callsign}<a
-										href="https://flightaware.com/live/flight/{callsign}"
-										target="_blank">{callsign}</a
-									>{:else}???{/if} ({icao})
-							</div>
-							<div><span class="font-bold">Alt:</span> {altitude ?? '?'} ft</div>
-							<div><span class="font-bold">Spd:</span> {speed.toFixed(0) ?? '?'} knots</div>
-							<div><span class="font-bold">Hdg:</span> {heading.toFixed(2)}°</div>
-							<div><span class="font-bold">Lng:</span> {lng.toFixed(6)}</div>
-							<div><span class="font-bold">Lat:</span> {lat.toFixed(6)}</div>
-						</Popup>
-					</div>
-				</Marker>
+				{#if lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180}
+					<GeoJSON data={pathData ?? ''} generateId={true}>
+						<LineLayer
+							layout={{ 'line-cap': 'round', 'line-join': 'round' }}
+							paint={{
+								'line-width': 2,
+								'line-color': '#008800',
+								'line-opacity': 0.8
+							}}
+						/>
+					</GeoJSON>
+					<Marker lngLat={[lng, lat]} class="relative">
+						<div
+							class={`p-2 border-blue-200 border focus:outline-2 focus:outline-black text-black rounded-full grid place-items-center opacity-80 ${markerColor(
+								altitude ?? 0
+							)}`}
+						>
+							<Icon path={mdiAirplane} rotate={heading - 45} />
+							{#if callsign}
+								<div class="absolute -top-4 -right-8 bg-black text-white rounded px-1">
+									{callsign}
+								</div>
+							{/if}
+							<Popup openOn="hover" offset={[0, -10]}>
+								<div>
+									<span class="font-bold">ID:</span>
+									{#if callsign}<a
+											href="https://flightaware.com/live/flight/{callsign}"
+											target="_blank">{callsign}</a
+										>{:else}???{/if} ({icao})
+								</div>
+								<div><span class="font-bold">Alt:</span> {altitude ?? '?'} ft</div>
+								<div><span class="font-bold">Spd:</span> {speed.toFixed(0) ?? '?'} knots</div>
+								<div><span class="font-bold">Hdg:</span> {heading.toFixed(2)}°</div>
+								<div><span class="font-bold">Lng:</span> {lng.toFixed(6)}</div>
+								<div><span class="font-bold">Lat:</span> {lat.toFixed(6)}</div>
+							</Popup>
+						</div>
+					</Marker>
+				{/if}
 			{/each}
 		</MapLibre>
 	</div>
