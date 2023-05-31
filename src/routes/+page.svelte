@@ -201,15 +201,19 @@
 													<Icon path={siAmericanairlines.path} size="0.8rem" color="#0078D2" />
 												{/if}
 											</a>
-											<span class="text-xs text-base-300 font-normal">(ICAO {aircraft.icao})</span>
-										{:else}<span class="text-base-300 font-normal">ICAO {aircraft.icao}</span>{/if}
+										{/if}
+										<span class="text-base-300 font-normal text-xs">ICAO {aircraft.icao}</span>
 									</div>
 								</th>
 								<td>
 									<div class="flex flex-col gap-0.5">
 										<div class="flex gap-2 items-center">
 											{#if aircraft.altitude >= 1000}
-												<span>FL{Math.floor(aircraft.altitude / 100).toString().padStart(3, '0')}</span>
+												<span
+													>FL{Math.floor(aircraft.altitude / 100)
+														.toString()
+														.padStart(3, '0')}</span
+												>
 											{:else}
 												<span>{numberFormat(aircraft.altitude)} ft</span>
 											{/if}
