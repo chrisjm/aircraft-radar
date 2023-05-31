@@ -180,7 +180,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						{#each filteredTable.sort(sorter({ value: 'callsign' })) as aircraft}
+						{#each filteredTable.sort(sorter({ value: 'altitude', descending: true })) as aircraft}
 							<tr>
 								<th>
 									<div class="flex flex-col">
